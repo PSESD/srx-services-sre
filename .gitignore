@@ -1,9 +1,10 @@
+# Scala
 *.class
 *.log
 
-# sbt specific
-.cache
-.history
+# SBT
+.cache/
+.history/
 .lib/
 dist/*
 target/
@@ -12,6 +13,15 @@ src_managed/
 project/boot/
 project/plugins/project/
 
-# Scala-IDE specific
-.scala_dependencies
-.worksheet
+# IntelliJ IDEA
+*.ipr
+*.iws
+.idea
+out
+
+# OSX
+*.DS_Store
+
+# Environment
+env*.properties
+buildinfo.properties
