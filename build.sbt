@@ -6,10 +6,13 @@ scalaVersion := "2.11.8"
 
 lazy val apacheHttpClientVersion = "4.5.2"
 lazy val http4sVersion = "0.14.1"
+lazy val jcraftVersion = "0.1.54"
 lazy val jodaConvertVersion = "1.8.1"
 lazy val jodaTimeVersion = "2.9.4"
 lazy val json4sVersion = "3.4.0"
 lazy val scalaTestVersion = "2.2.6"
+lazy val apacheCommonsVersion = "2.1"
+lazy val apachePoiVersion = "3.14"
 
 // Date/time
 libraryDependencies ++= Seq(
@@ -38,6 +41,13 @@ libraryDependencies ++= Seq(
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-blaze-client" % http4sVersion
+)
+
+// SFTP Client
+libraryDependencies ++= Seq(
+  "org.apache.commons" % "commons-vfs2" % apacheCommonsVersion,
+  "org.apache.poi" % "poi" % apachePoiVersion,
+  "com.jcraft" % "jsch" % jcraftVersion
 )
 
 // Build info
