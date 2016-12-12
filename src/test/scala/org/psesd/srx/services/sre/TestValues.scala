@@ -16,7 +16,7 @@ object TestValues {
   lazy val authorization = new SifAuthorization(sifProvider, timestamp)
   val id = "999"
 
-  val sreParameters = List[SifRequestParameter](SifRequestParameter("iv", "X-PSESD-IV"), SifRequestParameter("zoneId", "test"))
+  val sreParameters = List[SifRequestParameter](SifRequestParameter("iv", "X-PSESD-IV"), SifRequestParameter("zoneId", "test"), SifRequestParameter("generatorId", "runscope") )
   val sreXml = <sre><localId>{id}</localId></sre>
   lazy val testIv = "e675f725e675f725"
 

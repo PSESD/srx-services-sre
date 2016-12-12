@@ -139,11 +139,15 @@ object Sre extends SrxResourceService {
           sftpClient.write(getXmlFileName, sre.getBytes)
         }
 
+        val studentId = (sre.toXml \ "sre" \ "localStudentId" \ "idValue").text
+        log("Create", zoneId.get, studentId, parameters)
+
         new SreResult(
           SifRequestAction.Create,
           SifRequestAction.getSuccessStatusCode(SifRequestAction.Create)
         )
       }
+
     } catch {
       case e: Exception =>
         val test = e

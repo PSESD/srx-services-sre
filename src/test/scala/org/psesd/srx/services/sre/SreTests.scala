@@ -83,7 +83,7 @@ class SreTests extends FunSuite {
     assert(result.toXml.get.toXmlString.contains("id=\"%s\"".format("0")))
   }
 
-  ignore("create valid encrypted") {
+  test("create valid encrypted") {
     val result = Sre.create(TestValues.sreEncrypted, TestValues.sreParameters).asInstanceOf[SreResult]
     assert(result.success)
     assert(result.exceptions.isEmpty)
