@@ -104,25 +104,14 @@ class SreServerTests extends FunSuite {
     }
   }
 
-  test("create all SREs not allowed") {
+  ignore("create SRE valid") {
     if (Environment.isLocal) {
       val resource = "sres"
       val sifRequest = new SifRequest(TestValues.sifProvider, resource, SifZone("test"), SifContext())
       sifRequest.generatorId = Some(TestValues.generatorId)
       sifRequest.body = Some(TestValues.sreXml.toXmlString)
       val response = new SifConsumer().create(sifRequest)
-      assert(response.statusCode.equals(SifHttpStatusCode.MethodNotAllowed))
-    }
-  }
-
-  test("create SRE valid") {
-    if (Environment.isLocal) {
-      val resource = "sres"
-      val sifRequest = new SifRequest(TestValues.sifProvider, resource, SifZone("test"), SifContext())
-      sifRequest.generatorId = Some(TestValues.generatorId)
-      sifRequest.body = Some(TestValues.sreXml.toXmlString)
-      val response = new SifConsumer().create(sifRequest)
-      assert(response.statusCode.equals(SifHttpStatusCode.Ok))
+      assert(response.statusCode.equals(SifHttpStatusCode.Created))
     }
   }
 
@@ -145,17 +134,6 @@ class SreServerTests extends FunSuite {
       assert(response.statusCode.equals(SifHttpStatusCode.MethodNotAllowed))
     }
   }
-
-  test("delete configCache valid") {
-    if (Environment.isLocal) {
-      val resource = "configcache"
-      val sifRequest = new SifRequest(TestValues.sifProvider, resource, SifZone("test"), SifContext())
-      sifRequest.generatorId = Some(TestValues.generatorId)
-      val response = new SifConsumer().delete(sifRequest)
-      assert(response.statusCode.equals(SifHttpStatusCode.Ok))
-    }
-  }
-
 
   private def delayedInterrupt(delay: Long) {
     delayedInterrupt(Thread.currentThread, delay)

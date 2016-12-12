@@ -129,7 +129,7 @@ object Sre extends SrxResourceService {
         SrxResourceErrorResult(SifHttpStatusCode.BadRequest, new ArgumentNullOrEmptyOrWhitespaceException("zoneId parameter"))
       } else {
         val zoneConfig = new ZoneConfig(zoneId.get, SreServer.srxService.service.name)
-        val sreXml = (zoneConfig.zoneConfigXml.get \ "resource").find(r => (r \ "@type").text.toLowerCase() == "sre")
+        val sreXml = (zoneConfig.zoneConfigXml \ "resource").find(r => (r \ "@type").text.toLowerCase() == "sre")
         val sftpXml = (sreXml.get \ "destination" \ "sftp")
         val sftpConfig = new SftpConfig(sftpXml)
         val sftpClient = new SftpClient(sftpConfig)
@@ -187,11 +187,6 @@ object Sre extends SrxResourceService {
     }
   }
 
-  private def getZoneS3Client(zoneId: String): AmazonS3Client = {
-    val zoneConfig = ConfigCache.getConfig(zoneId, SreServer.srxService.service.name)
-    AmazonS3Client(zoneConfig.cacheBucketName, zoneConfig.cachePath)
-  }
-
   def log(method: String, zoneId: String, studentId: String, parameters: List[SifRequestParameter]): Unit = {
     val generatorId = getRequestParameter(parameters, SifHeader.GeneratorId.toString())
     val requestId = getRequestParameter(parameters, SifHeader.RequestId.toString())
@@ -206,7 +201,7 @@ object Sre extends SrxResourceService {
         SreServer.srxService,
         SifMessageId(),
         SifTimestamp(),
-        Some("xSRE"),
+        Some("SRE"),
         Some(method),
         Some("success"),
         generatorId,
