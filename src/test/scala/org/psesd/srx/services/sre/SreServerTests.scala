@@ -104,11 +104,11 @@ class SreServerTests extends FunSuite {
     }
   }
 
-  ignore("create SRE valid") {
+  test("create SRE valid") {
     if (Environment.isLocal) {
       val resource = "sres"
       val sifRequest = new SifRequest(TestValues.sifProvider, resource, SifZone("test"), SifContext())
-      sifRequest.generatorId = Some(TestValues.generatorId)
+      sifRequest.generatorId = Some("runscope")
       sifRequest.body = Some(TestValues.sreXml.toXmlString)
       val response = new SifConsumer().create(sifRequest)
       assert(response.statusCode.equals(SifHttpStatusCode.Created))

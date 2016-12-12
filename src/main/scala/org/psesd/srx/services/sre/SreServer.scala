@@ -61,7 +61,7 @@ object SreServer extends SrxServer {
       MethodNotAllowed()
 
     case req@POST -> Root / _ if services(req, sreResource) =>
-      executeRequest(req, None, sreResource, Sre, Sre.apply)
+      executeRequest(req, addSreParameters(req), sreResource, Sre, Sre.apply)
 
     case req@PUT -> Root / _ if services(req, sreResource) =>
       MethodNotAllowed()
@@ -91,6 +91,7 @@ object SreServer extends SrxServer {
     for (h <- req.headers) {
       val headerName = h.name.value.toLowerCase
       if(headerName == "X-PSESD-IV".toLowerCase) params += SifRequestParameter("X-PSESD-IV", h.value)
+      if(headerName == "generatorId".toLowerCase) params += SifRequestParameter("generatorId", h.value)
     }
     Some(params.toList)
   }

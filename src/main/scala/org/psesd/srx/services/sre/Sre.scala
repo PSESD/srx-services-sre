@@ -134,7 +134,10 @@ object Sre extends SrxResourceService {
         val sftpConfig = new SftpConfig(sftpXml)
         val sftpClient = new SftpClient(sftpConfig)
 
-        sftpClient.write(getXmlFileName, sre.getBytes)
+        val generatorId = getRequestParameter(parameters, "generatorId")
+        if (generatorId.isEmpty || generatorId.get != "runscope") {
+          sftpClient.write(getXmlFileName, sre.getBytes)
+        }
 
         new SreResult(
           SifRequestAction.Create,
