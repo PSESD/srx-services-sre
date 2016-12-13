@@ -9,18 +9,14 @@ import org.scalatest.FunSuite
 class SreTests extends FunSuite {
 
   test("constructor") {
-    val id = "999"
-    val sreXml = <sre><localId>{id}</localId></sre>
-    val sre = new Sre(id, sreXml.toXmlString)
-    assert(sre.id.equals(id))
+    val sre = new Sre(TestValues.id, TestValues.sreXml.toXmlString)
+    assert(sre.id.equals(TestValues.id))
     assert(sre.sre.contains("<sre>"))
   }
 
   test("factory") {
-    val id = "999"
-    val sreXml = <sre><localId>{id}</localId></sre>
-    val sre = Sre(sreXml.toXmlString)
-    assert(sre.id.equals(id))
+    val sre = Sre(TestValues.sreXml.toXmlString)
+    assert(sre.id.equals(TestValues.id))
     assert(sre.sre.contains("<sre>"))
   }
 
@@ -33,10 +29,8 @@ class SreTests extends FunSuite {
   }
 
   test("node") {
-    val id = "999"
-    val sreXml = <sre><localId>{id}</localId></sre>
-    val sre = Sre(sreXml, None)
-    assert(sre.id.equals(id))
+    val sre = Sre(TestValues.sreXml, None)
+    assert(sre.id.equals(TestValues.id))
     assert(sre.sre.contains("<sre>"))
   }
 
@@ -76,19 +70,18 @@ class SreTests extends FunSuite {
     assert(result.exceptions.head.getMessage.contains("The request body is invalid."))
   }
 
-  ignore("create valid unencrypted") {
+  test("create valid unencrypted") {
     val result = Sre.create(TestValues.sreUnencrypted, TestValues.sreParameters).asInstanceOf[SreResult]
     assert(result.success)
     assert(result.exceptions.isEmpty)
-    assert(result.toXml.get.toXmlString.contains("id=\"%s\"".format("0")))
+    assert(result.toXml.get.toXmlString.contains("id=\"%s\"".format("999")))
   }
 
   test("create valid encrypted") {
     val result = Sre.create(TestValues.sreEncrypted, TestValues.sreParameters).asInstanceOf[SreResult]
     assert(result.success)
     assert(result.exceptions.isEmpty)
-    assert(result.toXml.get.toXmlString.contains("id=\"%s\"".format("0")))
+    assert(result.toXml.get.toXmlString.contains("id=\"%s\"".format("999")))
   }
-
 
 }

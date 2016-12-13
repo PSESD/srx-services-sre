@@ -5,13 +5,13 @@ import java.security.SecureRandom
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.json4s.JValue
-import org.psesd.srx.shared.core.exceptions.{ArgumentInvalidException, ArgumentNullException, ArgumentNullOrEmptyOrWhitespaceException, SrxResourceNotFoundException}
+import org.psesd.srx.shared.core.exceptions.{ArgumentInvalidException, ArgumentNullException, ArgumentNullOrEmptyOrWhitespaceException}
 import org.psesd.srx.shared.core.extensions.TypeExtensions._
-import org.psesd.srx.shared.core.io.{AmazonS3Client, SftpClient}
+import org.psesd.srx.shared.core.io.SftpClient
 import org.psesd.srx.shared.core.sif.SifRequestAction.SifRequestAction
 import org.psesd.srx.shared.core.sif.{SifHttpStatusCode, SifRequestAction, SifRequestParameter, _}
 import org.psesd.srx.shared.core._
-import org.psesd.srx.shared.core.config.{ConfigCache, SftpConfig, ZoneConfig}
+import org.psesd.srx.shared.core.config.{SftpConfig, ZoneConfig}
 
 import scala.xml.Node
 
@@ -47,7 +47,8 @@ class Sre(val id: String, val sre: String) extends SrxResource {
   */
 class SreResult(
                   requestAction: SifRequestAction,
-                  httpStatusCode: Int
+                  httpStatusCode: Int,
+                  studentId: String
                 ) extends SrxResourceResult {
   statusCode = httpStatusCode
 
@@ -55,7 +56,7 @@ class SreResult(
     requestAction match {
 
       case SifRequestAction.Create =>
-        Option(SifCreateResponse().addResult("0", statusCode).toXml.toJsonString.toJson)
+        Option(SifCreateResponse().addResult(studentId, statusCode).toXml.toJsonString.toJson)
 
       case _ =>
         None
@@ -67,7 +68,7 @@ class SreResult(
     requestAction match {
 
       case SifRequestAction.Create =>
-        Option(SifCreateResponse().addResult("0", statusCode).toXml)
+        Option(SifCreateResponse().addResult(studentId, statusCode).toXml)
 
       case _ =>
         None
@@ -94,12 +95,15 @@ object Sre extends SrxResourceService {
       throw new ArgumentNullException("requestBody parameter")
     }
 
-    // TODO: find way to extract from incoming student record
-    val id = "0"
+    var studentId: String = ""
+    val sre = requestBody.getValue
+    if(sre.isDefined) {
+      studentId = getStudentId(sre.get.toXml)
+    }
 
     new Sre(
-      id,
-      requestBody.getValue.orNull
+      studentId,
+      sre.orNull
     )
   }
 
@@ -111,9 +115,8 @@ object Sre extends SrxResourceService {
     if (rootElementName != "sre") {
       throw new ArgumentInvalidException("root element '%s'".format(rootElementName))
     }
-    val id = (sreXml \ "localId").textOption.getOrElse("")
     new Sre(
-      id,
+      getStudentId(sreXml),
       sreXml.toXmlString
     )
   }
@@ -130,7 +133,7 @@ object Sre extends SrxResourceService {
       } else {
         val zoneConfig = new ZoneConfig(zoneId.get, SreServer.srxService.service.name)
         val sreXml = (zoneConfig.zoneConfigXml \ "resource").find(r => (r \ "@type").text.toLowerCase() == "sre")
-        val sftpXml = (sreXml.get \ "destination" \ "sftp")
+        val sftpXml = sreXml.get \ "destination" \ "sftp"
         val sftpConfig = new SftpConfig(sftpXml)
         val sftpClient = new SftpClient(sftpConfig)
 
@@ -139,12 +142,13 @@ object Sre extends SrxResourceService {
           sftpClient.write(getXmlFileName, sre.getBytes)
         }
 
-        val studentId = (sre.toXml \ "sre" \ "localStudentId" \ "idValue").text
+        val studentId = getStudentId(sre.toXml)
         log("Create", zoneId.get, studentId, parameters)
 
         new SreResult(
           SifRequestAction.Create,
-          SifRequestAction.getSuccessStatusCode(SifRequestAction.Create)
+          SifRequestAction.getSuccessStatusCode(SifRequestAction.Create),
+          studentId
         )
       }
 
@@ -179,6 +183,10 @@ object Sre extends SrxResourceService {
         result = Some("-1")
     }
     result
+  }
+
+  private def getStudentId(sreXml: Node): String = {
+    (sreXml \ "localStudentId" \ "idValue").textOption.getOrElse("")
   }
 
   private def getZoneIdFromRequestParameters(parameters: List[SifRequestParameter]): Option[String] = {

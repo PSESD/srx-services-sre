@@ -17,7 +17,7 @@ object TestValues {
   val id = "999"
 
   val sreParameters = List[SifRequestParameter](SifRequestParameter("iv", "X-PSESD-IV"), SifRequestParameter("zoneId", "test"), SifRequestParameter("generatorId", "runscope") )
-  val sreXml = <sre><localId>{id}</localId></sre>
+  val sreXml = <sre><localStudentId><idValue>{id}</idValue></localStudentId></sre>
   lazy val testIv = "e675f725e675f725"
 
   lazy val sreRequest = getRequest(sreXml.toXmlString, testIv, null)
