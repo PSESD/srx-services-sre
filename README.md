@@ -34,7 +34,7 @@ messageId | Consumer-generated. If specified, must be set to a valid UUID | ba74
 messageType | If specified, must be set to: REQUEST | REQUEST
 requestAction | If specified, must be set to: CREATE | CREATE
 requestId | Consumer-generated. If specified, must be set to a valid UUID | ba74efac-94c1-42bf-af8b-9b149d067816
-requestType | If specified, must be set to: DELAYED | DELAYED
+requestType | Must be set to DELAYED or IMMEDIATE. Defaults to IMMEDIATE. | IMMEDIATE
 serviceType | If specified, must be set to: OBJECT | OBJECT
 
 In addition, the request body must contain an AES encrypted payload representing the SRE file being submitted.
