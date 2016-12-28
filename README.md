@@ -15,14 +15,12 @@ zoneId    | Zone containing the requested student SRE record | seattle
 contextId | Client context of request. | CBO
 
 
-The following required headers must be present in the GET request:
+The following required headers must be present in the POST request:
 
 Header | Description | Example
 ------ | ----------- | -------
 authorization | Must be set to a valid HMAC-SHA256 encrypted authorization token | SIF_HMACSHA256 ZGNlYjgxZmQtNjE5My00NWVkL...
 timeStamp | Must be set to a valid date/time in the following format: yyyy-MM-ddTHH:mm:ss:SSSZ | 2016-12-20T18:09:18.539Z
-x-forwarded-port | Must be set to: 443 | 443
-x-forwarded-proto | Must be set to: https | https
 x-psesd-iv | Must be set to a valid PSESD iv value exactly 16 characters in length | g123j894w479q712
 
 The following optional headers may also be included:
