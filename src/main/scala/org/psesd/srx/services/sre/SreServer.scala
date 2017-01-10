@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext
 object SreServer extends SrxServer {
 
   private final val ServerUrlKey = "SERVER_URL"
-  private final val sreResource = "sres"
+  private final val sreResource = SrxResourceType.Sres.toString
   private final val configCacheResource = "configcache"
 
   val sifProvider: SifProvider = new SifProvider(
@@ -45,10 +45,10 @@ object SreServer extends SrxServer {
     case _ -> Root =>
       NotImplemented()
 
-    case req@GET -> Root / _ if services(req, CoreResource.Ping.toString) =>
+    case req@GET -> Root / _ if services(req, SrxResourceType.Ping.toString) =>
       Ok(true.toString)
 
-    case req@GET -> Root / _ if services(req, CoreResource.Info.toString) =>
+    case req@GET -> Root / _ if services(req, SrxResourceType.Info.toString) =>
       respondWithInfo(getDefaultSrxResponse(req))
 
 

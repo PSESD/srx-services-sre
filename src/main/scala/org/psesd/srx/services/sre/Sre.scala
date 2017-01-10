@@ -5,6 +5,7 @@ import java.security.SecureRandom
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.json4s.JValue
+import org.psesd.srx.shared.core.SrxMessageStatus.SrxMessageStatus
 import org.psesd.srx.shared.core.exceptions.{ArgumentInvalidException, ArgumentNullException, ArgumentNullOrEmptyOrWhitespaceException}
 import org.psesd.srx.shared.core.extensions.TypeExtensions._
 import org.psesd.srx.shared.core.io.SftpClient
@@ -143,7 +144,7 @@ object Sre extends SrxResourceService {
         }
 
         val studentId = getStudentId(sre.toXml)
-        log("Create", zoneId.get, studentId, parameters)
+        logSreMessage(SifRequestAction.Create, SrxMessageStatus.Success, zoneId.get, studentId, sre, parameters)
 
         new SreResult(
           SifRequestAction.Create,
@@ -202,13 +203,23 @@ object Sre extends SrxResourceService {
     }
   }
 
-  def log(method: String, zoneId: String, studentId: String, parameters: List[SifRequestParameter]): Unit = {
-    val generatorId = getRequestParameter(parameters, SifHeader.GeneratorId.toString())
-    val requestId = getRequestParameter(parameters, SifHeader.RequestId.toString())
+  def logSreMessage(method: SifRequestAction, status: SrxMessageStatus, zoneId: String, studentId: String, requestBody: String, parameters: List[SifRequestParameter]): Unit = {
+    val generatorId = getRequestParameter(parameters, SifHeader.GeneratorId.toString)
+    val requestId = getRequestParameter(parameters, SifHeader.RequestId.toString)
     val uri = getRequestParameter(parameters, "uri")
-    val sourceIp = getRequestParameter(parameters, SifHttpHeader.ForwardedFor.toString())
-    val userAgent = getRequestParameter(parameters, SifHttpHeader.UserAgent.toString())
+    val sourceIp = getRequestParameter(parameters, SifHttpHeader.ForwardedFor.toString)
+    val userAgent = getRequestParameter(parameters, SifHttpHeader.UserAgent.toString)
     val contextId = getRequestParameter(parameters, "contextId")
+
+    val headers: String = {
+      val sb = new StringBuilder("")
+      var sep = ""
+      for (p <- parameters) {
+        sb.append("%s%s=%s".format(sep, p.key, p.value))
+        sep = ";"
+      }
+      sb.toString
+    }
 
     SrxMessageService.createMessage(
       SreServer.srxService.service.name,
@@ -216,20 +227,20 @@ object Sre extends SrxResourceService {
         SreServer.srxService,
         SifMessageId(),
         SifTimestamp(),
-        Some("SRE"),
-        Some(method),
-        Some("success"),
+        Some(SrxResourceType.Sres.toString),
+        Some(method.toString),
+        Some(status.toString),
         generatorId,
         requestId,
         Some(SifZone(zoneId)),
         { if (contextId.isDefined) Some(SifContext(contextId.get)) else None },
         Some(studentId),
-        "%s successful for student '%s' in zone '%s'.".format(method, studentId, zoneId),
+        "%s successful for student '%s' in zone '%s'.".format(method.toString, studentId, zoneId),
         uri,
         userAgent,
         sourceIp,
-        None,
-        None
+        Some(headers),
+        Some(requestBody)
       )
     )
   }
