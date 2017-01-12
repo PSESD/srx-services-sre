@@ -2,6 +2,63 @@
 **Transfers SRE XML from District to District.**
 
 ***
+
+## Configuration
+
+### Environment Variables
+Variable | Description | Example
+-------- | ----------- | -------
+AES_PASSWORD | Password used to decrypt AES encrypted request body payloads. |  (see Heroku)
+AES_SALT | Salt used to decrypt AES encrypted request body payloads. | (see Heroku)
+AMAZON_S3_ACCESS_KEY | AWS S3 access key for SRX cache. | (see Heroku)
+AMAZON_S3_BUCKET_NAME | AWS S3 bucket name for SRX cache. | (see Heroku)
+AMAZON_S3_PATH | Root path to files within SRX cache. | (see Heroku)
+AMAZON_S3_SECRET | AWS S3 secret for SRX cache. | (see Heroku)
+AMAZON_S3_TIMEOUT | AWS S3 request timeout in ms. | 300000
+ENVIRONMENT | Deployment environment name.  | development
+LOG_LEVEL | Logging level (info, debug, error). | debug
+ROLLBAR_ACCESS_TOKEN | Rollbar access token for error logging. | (see Heroku)
+ROLLBAR_URL | URL to Rollbar API. | https://api.rollbar.com/api/1/item/
+SERVER_API_ROOT | Root path for this service. | (typically leave blank)
+SERVER_HOST  | Host IP for this service. | 127.0.0.1
+SERVER_NAME | Server name for this service. | localhost
+SERVER_PORT | Port this service listens on. | 8080
+SERVER_URL | URL for this service. | http://localhost
+SRX_ENVIRONMENT_URL | HostedZone environment URL. | https://psesd.hostedzone.com/svcs/dev/requestProvider
+SRX_SESSION_TOKEN | HostedZone session token assigned to this service. | (see HostedZone configuration)
+SRX_SHARED_SECRET  | HostedZone shared secret assigned to this service. | (see HostedZone configuration)
+
+### HostedZone
+The SRE service (srx-services-sre) must be registered in HostedZone as a new "environment" (application) that provides the following "services" (resources):
+
+ * sres
+
+Once registered, the supplied HostedZone session token and shared secret should be set in the srx-services-sres host server (Heroku) environment variables (see above).
+
+This SRE service must be further configured in HostedZone as follows:
+
+Service | Zone | Context | Provide | Query | Create | Update | Delete
+------- | ---- | ------- | ------- | ----- | ------ | ------ | ------
+sres | default | default | X | | | | |
+sres | [district*] | transfer | X | | | | |
+sres | test | default | X | | | | |
+sres | test | test | X | | | | |
+sres | test | transfer | X | | | | |
+srxMessages | default | default |   | |X | | |
+srxMessages | [district*] | default |   | |X | | |
+srxMessages | test | default |   | |X | | |
+srxMessages | test | test |   | |X | | |
+srxZoneConfig | default | default |   | X| | | |
+srxZoneConfig | [district*] | default |   | X| | | |
+srxZoneConfig | test | default |   | X| | | |
+srxZoneConfig | test | test |   | X| | | |
+
+[district*] = all district zones utilizing SRX services
+
+## Usage
+```TODO: usage details go here```
+
+### SREs
 SREs are submitted via a POST request using the following URL format:
 
 ```
