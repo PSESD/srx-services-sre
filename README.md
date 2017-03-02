@@ -56,7 +56,6 @@ srxZoneConfig | test | test |   | X| | | |
 [district*] = all district zones utilizing SRX services
 
 ## Usage
-```TODO: usage details go here```
 
 ### SREs
 SREs are submitted via a POST request using the following URL format:
